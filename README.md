@@ -3,7 +3,7 @@
 A small SQL + Python project simulating the core commercial-analytics workflows
 in a pharma/healthcare consulting engagement: **HCP segmentation, call plan
 gap analysis, incentive compensation, and marketing-channel lift** — the same
-four use cases named in commercial analytics BA job descriptions.
+four use cases named in commercial analytics BA job descriptions.It includes a dedicated ETL pipeline to extract messy CRM CSVs, standardise schemas, and load clean data for analysis.
 
 ## Data model (SQLite — `schema.sql`)
 
@@ -12,10 +12,8 @@ four use cases named in commercial analytics BA job descriptions.
 - `calls` — rep visit log (date, channel: in-person / virtual / email)
 - `rx` — monthly prescription volume (TRx, NRx) per HCP per product
 
-`data_generator.py` builds a synthetic but internally-consistent 12-month
-dataset (200 HCPs, 20 reps, ~5k Rx rows) with a real signal: higher-potential
-HCPs get more calls and higher baseline Rx, and a call in a given month gives
-that month's Rx a small bump — so the SQL below finds genuine patterns, not noise.
+`data_generator.py` generates raw, noisy CRM data exports into a raw_data/ folder (intentionally injecting missing values and date schema errors).
+`etl_pipeline.py` ingests these CSVs, drops duplicates, imputes missing values, standardises schemas, and builds the clean pharma_analytics.db
 
 ## The four analyses (`queries.sql`, run via `analysis.py`)
 
@@ -41,6 +39,7 @@ that month's Rx a small bump — so the SQL below finds genuine patterns, not no
 ```bash
 pip install pandas numpy matplotlib
 python data_generator.py   # builds pharma_analytics.db
+python etl_pipeline.py     # cleans data, standardises schemas, build db
 python analysis.py         # runs the 4 queries, saves charts/
 ```
 
